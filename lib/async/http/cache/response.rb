@@ -20,12 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/http/client'
-require 'protocol/http/headers'
-require 'protocol/http/middleware'
+require 'protocol/http/response'
 require 'async/clock'
-
-require 'protocol/http/body/cacheable'
 
 module Async
 	module HTTP
