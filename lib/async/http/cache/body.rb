@@ -1,4 +1,6 @@
-# Copyright, 2019, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# frozen_string_literal: true
+#
+# Copyright, 2020, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,29 +20,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/http/server'
+require 'protocol/http/body/rewindable'
+require 'protocol/http/body/streamable'
 
-RSpec.shared_context Async::HTTP::Server do
-	include_context Async::RSpec::Reactor
-	
-	let(:protocol) {Async::HTTP::Protocol::HTTP2}
-	let(:endpoint) {Async::HTTP::Endpoint.parse('http://127.0.0.1:9294', reuse_port: true)}
-	let!(:client) {Async::HTTP::Client.new(endpoint, protocol)}
-	
-	let!(:server_task) do
-		reactor.async do
-			server.run
-		end
-	end
-	
-	after(:each) do
-		client.close
-		server_task.stop
-	end
-	
-	let(:server) do
-		Async::HTTP::Server.for(endpoint, protocol) do |request|
-			Protocol::HTTP::Response[200, {}, []]
+module Async
+	module HTTP
+		module Cache
+			module Body
+				def self.wrap(message, &block)
+					if body = message.body
+						# Create a rewindable body wrapping the message body:
+						rewindable = ::Protocol::HTTP::Body::Rewindable.new(body)
+						
+						# Set the message body to the rewindable body:
+						message.body = rewindable
+						
+						# Wrap the message with the callback:
+						::Protocol::HTTP::Body::Streamable.wrap(message) do |error|
+							unless error
+								yield message, rewindable.buffered
+							end
+						end
+					else
+						yield message, nil
+					end
+					
+					return message
+				end
+			end
 		end
 	end
 end

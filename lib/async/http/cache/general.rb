@@ -21,8 +21,8 @@
 # THE SOFTWARE.
 
 require 'protocol/http/middleware'
-require 'protocol/http/body/cacheable'
 
+require_relative 'body'
 require_relative 'response'
 require_relative 'store'
 
@@ -49,7 +49,7 @@ module Async
 					[request.authority, request.method, request.path]
 				end
 				
-				def cachable?(request)
+				def cacheable?(request)
 					# We don't support caching requests which have a body:
 					if request.body
 						return false
@@ -88,7 +88,7 @@ module Async
 						end
 					end
 					
-					return Body::Cacheable.wrap(response) do |message, body|
+					return Body.wrap(response) do |message, body|
 						@store.insert(key, request, Response.new(message, body))
 					end
 				end
@@ -109,7 +109,7 @@ module Async
 					end
 					
 					unless cache_control&.no_store?
-						if cachable?(request)
+						if cacheable?(request)
 							Async.logger.debug(self) {"Updating cache for #{key}..."}
 							return wrap(key, request, super)
 						end
