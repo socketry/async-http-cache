@@ -75,7 +75,7 @@ module Async
 				
 				def wrap(key, request, response)
 					if response.status != 200
-						return false
+						return response
 					end
 					
 					if body = response.body
