@@ -25,11 +25,28 @@ module Async
 		module Cache
 			module Store
 				VARY = 'vary'
+				ACCEPT_ENCODING = 'accept-encoding'
 				
 				class Vary
-					def initialize(store, vary = {})
-						@store = store
+					def initialize(delegate, vary = {})
+						@delegate = delegate
 						@vary = vary
+					end
+					
+					attr :delegate
+					
+					def normalize(request)
+						if accept_encoding = request.headers[ACCEPT_ENCODING]
+							if accept_encoding.include?("gzip")
+								request.headers.set(ACCEPT_ENCODING, "gzip")
+							else
+								request.headers.delete(ACCEPT_ENCODING)
+							end
+						end
+						
+						if vary = request.headers[VARY]
+							vary.sort!
+						end
 					end
 					
 					def lookup(key, request)
@@ -38,15 +55,17 @@ module Async
 							key = key + request.headers.extract(vary)
 						end
 						
-						return @store.lookup(key, request)
+						return @delegate.lookup(key, request)
 					end
 					
 					def insert(key, request, response)
 						if vary = response.headers[VARY]
+							@vary[key] = vary
+							
 							key = key + request.headers.extract(vary)
 						end
 						
-						@store.insert(key, request, response)
+						@delegate.insert(key, request, response)
 					end
 				end
 			end

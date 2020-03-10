@@ -33,6 +33,7 @@ module Async
 				CACHE_CONTROL  = 'cache-control'
 				CONTENT_TYPE = 'content-type'
 				AUTHORIZATION = 'authorization'
+				COOKIE = 'cookie'
 				
 				def initialize(app, store: Store.default)
 					super(app)
@@ -44,8 +45,11 @@ module Async
 				end
 				
 				attr :count
+				attr :store
 				
 				def key(request)
+					@store.normalize(request)
+					
 					[request.authority, request.method, request.path]
 				end
 				
@@ -60,17 +64,21 @@ module Async
 						return false
 					end
 					
+					# We only support caching GET and HEAD requests:
+					unless request.method == 'GET' || request.method == 'HEAD'
+						return false
+					end
+					
 					if request.headers[AUTHORIZATION]
 						return false
 					end
 					
-					# We only support caching GET and HEAD requests:
-					if request.method == 'GET' || request.method == 'HEAD'
-						return true
+					if request.headers[COOKIE]
+						return false
 					end
 					
-					# Otherwise, we can't cache it:
-					return false
+					# Otherwise, we can cache it:
+					return true
 				end
 				
 				def wrap(key, request, response)

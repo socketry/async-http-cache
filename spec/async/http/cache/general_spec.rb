@@ -22,24 +22,21 @@ require_relative 'server_context'
 
 require 'async/http/cache/general'
 
-require 'async/http/server'
-require 'async/http/client'
-require 'async/reactor'
-
-require 'async/io/ssl_socket'
-require 'async/http/endpoint'
-require 'protocol/http/accept_encoding'
-
 RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 	include_context Async::HTTP::Server
 	
 	let(:server) do
 		Async::HTTP::Server.for(endpoint, protocol) do |request|
-			Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public']], ['Hello', ' ', 'World']]
+			if accept_language = request.headers['accept-language']
+				
+			else
+				Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public']], ['Hello', ' ', 'World']]
+			end
 		end
 	end
 	
 	subject {described_class.new(client)}
+	let(:store) {subject.store.delegate}
 	
 	it "should cache GET requests" do
 		response = subject.get("/")
@@ -61,5 +58,23 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 		expect(response.read).to be == "Hello World"
 		
 		expect(subject).to have_attributes(count: 0)
+	end
+	
+	context 'with varied response' do
+		let(:server) do
+			Async::HTTP::Server.for(endpoint, protocol) do |request|
+				if user_agent = request.headers['user-agent']
+					Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public'], ['vary', 'user-agent']], [user_agent]]
+				else
+					Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public'], ['vary', 'user-agent']], ['Hello', ' ', 'World']]
+				end
+			end
+		end
+		
+		it "should cache GET requests" do
+			response = subject.get("/", {'user-agent' => 'test-a'})
+			expect(response.headers['vary']).to include('user-agent')
+			expect(response.read).to be == 'test-a'
+		end
 	end
 end
