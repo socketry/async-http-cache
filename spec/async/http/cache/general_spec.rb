@@ -73,11 +73,15 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 		]}
 		
 		it "should cache GET requests" do
-			user_agents.each do |user_agent|
-				response = subject.get("/", {'user-agent' => user_agent})
-				expect(response.headers['vary']).to include('user-agent')
-				expect(response.read).to be == user_agent
+			2.times do
+				user_agents.each do |user_agent|
+					response = subject.get("/", {'user-agent' => user_agent})
+					expect(response.headers['vary']).to include('user-agent')
+					expect(response.read).to be == user_agent
+				end
 			end
+			
+			expect(store.index.size).to be 2
 		end
 	end
 end

@@ -29,6 +29,8 @@ module Async
 						@index = {}
 					end
 					
+					attr :index
+					
 					def lookup(key, request)
 						if response = @index[key]
 							if response.expired?
