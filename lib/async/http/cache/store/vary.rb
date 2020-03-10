@@ -43,26 +43,26 @@ module Async
 								request.headers.delete(ACCEPT_ENCODING)
 							end
 						end
-						
-						if vary = request.headers[VARY]
-							vary.sort!
-						end
+					end
+					
+					def key_for(headers, vary)
+						vary.map{|key| headers[key]}
 					end
 					
 					def lookup(key, request)
 						if vary = @vary[key]
 							# We should provide user-supported normalization here:
-							key = key + request.headers.extract(vary)
+							key = key + key_for(request.headers, vary)
 						end
 						
 						return @delegate.lookup(key, request)
 					end
 					
 					def insert(key, request, response)
-						if vary = response.headers[VARY]
+						if vary = response.headers[VARY]&.sort
 							@vary[key] = vary
 							
-							key = key + request.headers.extract(vary)
+							key = key + key_for(request.headers, vary)
 						end
 						
 						@delegate.insert(key, request, response)

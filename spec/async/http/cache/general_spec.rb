@@ -27,11 +27,7 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 	
 	let(:server) do
 		Async::HTTP::Server.for(endpoint, protocol) do |request|
-			if accept_language = request.headers['accept-language']
-				
-			else
-				Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public']], ['Hello', ' ', 'World']]
-			end
+			Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public']], ['Hello', ' ', 'World']]
 		end
 	end
 	
@@ -71,10 +67,17 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 			end
 		end
 		
+		let(:user_agents) {[
+			'test-a',
+			'test-b',
+		]}
+		
 		it "should cache GET requests" do
-			response = subject.get("/", {'user-agent' => 'test-a'})
-			expect(response.headers['vary']).to include('user-agent')
-			expect(response.read).to be == 'test-a'
+			user_agents.each do |user_agent|
+				response = subject.get("/", {'user-agent' => user_agent})
+				expect(response.headers['vary']).to include('user-agent')
+				expect(response.read).to be == user_agent
+			end
 		end
 	end
 end
