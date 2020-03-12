@@ -47,19 +47,18 @@ module Async
 				attr :generated_at
 				
 				def cachable?
+					if cache_control = @headers[CACHE_CONTROL]
+						if cache_control.private? || !cache_control.public?
+							return false
+						end
+					end
+					
 					if set_cookie = @headers[SET_COOKIE]
+						Async.logger.warn(self) {"Cannot cache response with set-cookie header!"}
 						return false
 					end
 					
-					if cache_control = @headers[CACHE_CONTROL]
-						if cache_control.private?
-							return false
-						end
-						
-						if cache_control.public?
-							return true
-						end
-					end
+					return true
 				end
 				
 				def age
