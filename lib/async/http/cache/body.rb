@@ -37,7 +37,9 @@ module Async
 						
 						# Wrap the message with the callback:
 						::Protocol::HTTP::Body::Streamable.wrap(message) do |error|
-							unless error
+							if error
+								Async.logger.error(self) {error}
+							else
 								yield message, rewindable.buffered
 							end
 						end
