@@ -85,8 +85,8 @@ module Async
 						return response
 					end
 					
-					
 					return Body.wrap(response) do |message, body|
+						Async.logger.debug(self) {"Updating cache for #{key}..."}
 						@store.insert(key, request, Response.new(message, body))
 					end
 				end
@@ -108,7 +108,6 @@ module Async
 					
 					unless cache_control&.no_store?
 						if cacheable?(request)
-							Async.logger.debug(self) {"Updating cache for #{key}..."}
 							return wrap(key, request, super)
 						end
 					end
