@@ -41,7 +41,6 @@ module Async
 					@count = 0
 					
 					@store = store
-					@maximum_length = 128 * 1024
 				end
 				
 				attr :count
@@ -86,15 +85,6 @@ module Async
 						return response
 					end
 					
-					if body = response.body
-						if length = body.length
-							# Don't cache responses bigger than 128Kb:
-							return response if length > @maximum_length
-						else
-							# Don't cache responses without length:
-							return response
-						end
-					end
 					
 					return Body.wrap(response) do |message, body|
 						@store.insert(key, request, Response.new(message, body))
