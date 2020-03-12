@@ -25,8 +25,41 @@ module Async
 		module Cache
 			module Store
 				class Memory
-					def initialize
+					def initialize(limit: 1024)
 						@index = {}
+						@limit = limit
+						
+						@hit = 0
+						@miss = 0
+						@pruned = 0
+						
+						@gardener = Async do |task|
+							while true
+								task.sleep(60)
+								
+								pruned = self.prune
+								@pruned += pruned
+								
+								Async.logger.debug(self) do |buffer|
+									if pruned > 0
+										buffer.puts "Pruned #{pruned} entries."
+									end
+									
+									buffer.puts "Hits: #{@hit} Misses: #{@miss} Pruned: #{@pruned} Ratio: #{(100.0*@hit/@miss).round(2)}%"
+									
+									body_usage = @index.sum{|key, value| value.body.length}
+									buffer.puts "Index size: #{@index.size} Memory usage: #{(body_usage / 1024.0**2).round(2)}MiB"
+									
+									# @index.each do |key, value|
+									# 	buffer.puts "#{key.join('-')}: #{value.body.length}B"
+									# end
+								end
+							end
+						end
+					end
+					
+					def close
+						@gardener.stop
 					end
 					
 					attr :index
@@ -36,15 +69,38 @@ module Async
 							if response.expired?
 								@index.delete(key)
 								
+								@pruned += 1
+								
 								return nil
 							end
 							
+							@hit += 1
+							
 							return response.dup
+						else
+							@miss += 1
+							
+							return nil
 						end
 					end
 					
 					def insert(key, request, response)
-						@index[key] = response
+						if @index.size < @limit
+							if response.body.length < 1024*64
+								@index[key] = response
+							end
+						end
+					end
+					
+					# @return [Integer] the number of pruned entries.
+					def prune
+						initial_count = @index.size
+						
+						@index.delete_if do |key, value|
+							value.expired?
+						end
+						
+						return initial_count - @index.size
 					end
 				end
 			end

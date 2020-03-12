@@ -46,6 +46,12 @@ module Async
 				attr :count
 				attr :store
 				
+				def close
+					@store.close
+				ensure
+					super
+				end
+				
 				def key(request)
 					@store.normalize(request)
 					

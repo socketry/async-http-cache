@@ -33,6 +33,10 @@ module Async
 						@vary = vary
 					end
 					
+					def close
+						@delegate.close
+					end
+					
 					attr :delegate
 					
 					def normalize(request)
