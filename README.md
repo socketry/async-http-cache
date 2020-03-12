@@ -30,6 +30,10 @@ ensure
 end
 ```
 
+## Vary
+
+The `vary` header creates a headache for proxy implementations, because it creates a combinatorial explosion of cache keys, even if the content is the same. Try to avoid it unless absolutely necessary.
+
 ## Contributing
 
 1. Fork it
