@@ -51,6 +51,9 @@ module Async
 						if cache_control.private? || !cache_control.public?
 							return false
 						end
+					else
+						# No cache control header...
+						return false
 					end
 					
 					if set_cookie = @headers[SET_COOKIE]
@@ -66,7 +69,9 @@ module Async
 				end
 				
 				def expired?
-					self.age > @max_age
+					if @max_age
+						self.age > @max_age
+					end
 				end
 				
 				def dup
