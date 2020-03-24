@@ -86,7 +86,8 @@ module Async
 					
 					def insert(key, request, response)
 						if @index.size < @limit
-							if response.body.length < 1024*64
+							length = response.body&.length
+							if length.nil? or length < 1024*64
 								@index[key] = response
 							end
 						end
