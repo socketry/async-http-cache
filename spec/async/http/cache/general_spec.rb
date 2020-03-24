@@ -46,6 +46,21 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 		expect(subject).to have_attributes(count: 10)
 	end
 	
+	it "should cache HEAD requests" do
+		response = subject.head("/")
+		content_length = response.body.length
+		expect(content_length).to be == 11
+		expect(response.read).to be_nil
+		
+		10.times do
+			response = subject.head("/")
+			expect(response.body.length).to be == content_length
+			expect(response.read).to be_nil
+		end
+		
+		expect(subject).to have_attributes(count: 10)
+	end
+	
 	it "should not cache POST requests" do
 		response = subject.post("/")
 		expect(response.read).to be == "Hello World"

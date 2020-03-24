@@ -29,18 +29,23 @@ module Async
 			module Body
 				def self.wrap(message, &block)
 					if body = message.body
-						# Create a rewindable body wrapping the message body:
-						rewindable = ::Protocol::HTTP::Body::Rewindable.new(body)
-						
-						# Set the message body to the rewindable body:
-						message.body = rewindable
-						
-						# Wrap the message with the callback:
-						::Protocol::HTTP::Body::Streamable.wrap(message) do |error|
-							if error
-								Async.logger.error(self) {error}
-							else
-								yield message, rewindable.buffered
+						if body.empty?
+							# A body that is empty? at the outset, is immutable. This generally only applies to HEAD requests.
+							yield message, body
+						else
+							# Create a rewindable body wrapping the message body:
+							rewindable = ::Protocol::HTTP::Body::Rewindable.new(body)
+							
+							# Set the message body to the rewindable body:
+							message.body = rewindable
+							
+							# Wrap the message with the callback:
+							::Protocol::HTTP::Body::Streamable.wrap(message) do |error|
+								if error
+									Async.logger.error(self) {error}
+								else
+									yield message, rewindable.buffered
+								end
 							end
 						end
 					else
