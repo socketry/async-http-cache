@@ -27,32 +27,36 @@ module Async
 	module HTTP
 		module Cache
 			module Body
-				def self.wrap(message, &block)
-					if body = message.body
+				def self.wrap(response, &block)
+					if body = response.body
 						if body.empty?
 							# A body that is empty? at the outset, is immutable. This generally only applies to HEAD requests.
-							yield message, body
+							yield response, body
 						else
-							# Create a rewindable body wrapping the message body:
+							# Create a rewindable body wrapping the response body:
 							rewindable = ::Protocol::HTTP::Body::Rewindable.new(body)
 							
-							# Set the message body to the rewindable body:
-							message.body = rewindable
+							# Set the response body to the rewindable body:
+							response.body = rewindable
 							
-							# Wrap the message with the callback:
-							::Protocol::HTTP::Body::Streamable.wrap(message) do |error|
+							# It's not supported yet...
+							response.headers.add('trailers', 'etag')
+							response.trailers.add('etag') {rewindable.digest}
+							
+							# Wrap the response with the callback:
+							::Protocol::HTTP::Body::Streamable.wrap(response) do |error|
 								if error
 									Async.logger.error(self) {error}
 								else
-									yield message, rewindable.buffered
+									yield response, rewindable.buffered
 								end
 							end
 						end
 					else
-						yield message, nil
+						yield response, nil
 					end
 					
-					return message
+					return response
 				end
 			end
 		end

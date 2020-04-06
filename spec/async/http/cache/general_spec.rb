@@ -99,4 +99,21 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 			expect(store.index.size).to be 2
 		end
 	end
+	
+	context 'with if-none-match' do
+		it 'validate etag' do
+			# First, warm up the cache:
+			response = subject.get("/")
+			body = response.finish
+			
+			expect(response.headers).to_not include('etag')
+			
+			response = subject.get("/")
+			expect(response.headers).to include('etag')
+			etag = response.headers['etag']
+			
+			response = subject.get("/", {'if-none-match' => etag})
+			expect(response).to be_not_modified
+		end
+	end
 end

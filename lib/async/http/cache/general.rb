@@ -31,6 +31,7 @@ module Async
 		module Cache
 			class General < ::Protocol::HTTP::Middleware
 				CACHE_CONTROL  = 'cache-control'
+				
 				CONTENT_TYPE = 'content-type'
 				AUTHORIZATION = 'authorization'
 				COOKIE = 'cookie'
@@ -107,7 +108,7 @@ module Async
 							Async.logger.debug(self) {"Cache hit for #{key}..."}
 							@count += 1
 							
-							# Create a dup of the response:
+							# Return the cached response:
 							return response
 						end
 					end

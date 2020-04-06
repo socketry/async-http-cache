@@ -29,6 +29,10 @@ module Async
 			class Response < ::Protocol::HTTP::Response
 				CACHE_CONTROL = 'cache-control'
 				SET_COOKIE = 'set-cookie'
+				ETAG = 'etag'
+				
+				X_SERVED_BY = 'x-served-by'
+				X_CACHE = 'x-cache'
 				
 				def initialize(response, body)
 					@generated_at = Async::Clock.now
@@ -42,8 +46,19 @@ module Async
 					)
 					
 					@max_age = @headers[CACHE_CONTROL]&.max_age
+					
+					if @body && @body.respond_to?(:digest)
+						@etag = @body.digest.dump
+						@headers.set(ETAG, @etag)
+					else
+						@etag = nil
+					end
+					
+					@headers.set(X_SERVED_BY, 'Async::HTTP::Cache')
+					@headers.set(X_CACHE, 'hit')
 				end
 				
+				attr :etag
 				attr :generated_at
 				
 				def cachable?

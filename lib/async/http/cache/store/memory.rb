@@ -64,6 +64,9 @@ module Async
 					
 					attr :index
 					
+					IF_NONE_MATCH = 'if-none-match'
+					NOT_MODIFIED = ::Protocol::HTTP::Response[304]
+					
 					def lookup(key, request)
 						if response = @index[key]
 							if response.expired?
@@ -72,6 +75,12 @@ module Async
 								@pruned += 1
 								
 								return nil
+							end
+							
+							if etags = request.headers[IF_NONE_MATCH]
+								if etags.include?(response.etag)
+									return NOT_MODIFIED
+								end
 							end
 							
 							@hit += 1
