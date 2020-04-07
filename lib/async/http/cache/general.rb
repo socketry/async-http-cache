@@ -92,9 +92,17 @@ module Async
 						return response
 					end
 					
-					return Body.wrap(response) do |message, body|
+					if request.head? and body = response.body
+						unless body.empty?
+							Async.logger.warn(self) {"HEAD request resulted in non-empty body!"}
+							
+							return response
+						end
+					end
+					
+					return Body.wrap(response) do |response, body|
 						Async.logger.debug(self) {"Updating cache for #{key}..."}
-						@store.insert(key, request, Response.new(message, body))
+						@store.insert(key, request, Response.new(response, body))
 					end
 				end
 				

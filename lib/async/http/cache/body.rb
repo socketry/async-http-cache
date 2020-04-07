@@ -22,6 +22,7 @@
 
 require 'protocol/http/body/rewindable'
 require 'protocol/http/body/streamable'
+require 'protocol/http/body/digestable'
 
 module Async
 	module HTTP
@@ -33,15 +34,16 @@ module Async
 							# A body that is empty? at the outset, is immutable. This generally only applies to HEAD requests.
 							yield response, body
 						else
-							# Create a rewindable body wrapping the response body:
-							rewindable = ::Protocol::HTTP::Body::Rewindable.new(body)
+							# Insert a rewindable body so that we can cache the response body:
+							rewindable = ::Protocol::HTTP::Body::Rewindable.wrap(response)
 							
-							# Set the response body to the rewindable body:
-							response.body = rewindable
+							# Compute a digest and add it to the response headers:
+							::Protocol::HTTP::Body::Digestable.wrap(response) do |wrapper|
+								response.headers.add('etag', wrapper.etag)
+							end
 							
-							# It's not supported yet...
+							# Ensure the etag is listed as a trailer:
 							response.headers.add('trailers', 'etag')
-							response.trailers.add('etag') {rewindable.digest}
 							
 							# Wrap the response with the callback:
 							::Protocol::HTTP::Body::Streamable.wrap(response) do |error|

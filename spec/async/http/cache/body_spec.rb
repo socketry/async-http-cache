@@ -26,13 +26,13 @@ RSpec.describe Async::HTTP::Cache::Body do
 	include_context RSpec::Memory
 	
 	let(:body) {Protocol::HTTP::Body::Buffered.new(["Hello", "World"])}
-	let(:message) {Protocol::HTTP::Response[200, [], body]}
+	let(:response) {Protocol::HTTP::Response[200, [], body]}
 	
 	describe ".wrap" do
 		it "can buffer and stream bodies" do
 			invoked = false
 			
-			described_class.wrap(message) do |message, body|
+			described_class.wrap(response) do |response, body|
 				invoked = true
 				
 				# The cached/buffered body:
@@ -41,7 +41,7 @@ RSpec.describe Async::HTTP::Cache::Body do
 				expect(body.read).to be nil
 			end
 			
-			body = message.body
+			body = response.body
 			
 			# The actual body:
 			expect(body.read).to be == "Hello"
@@ -56,11 +56,11 @@ RSpec.describe Async::HTTP::Cache::Body do
 		it "ignores failed responses" do
 			invoked = false
 			
-			described_class.wrap(message) do
+			described_class.wrap(response) do
 				invoked = true
 			end
 			
-			body = message.body
+			body = response.body
 			
 			expect(body.read).to be == "Hello"
 			

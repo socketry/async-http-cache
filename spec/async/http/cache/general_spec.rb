@@ -22,18 +22,7 @@ require_relative 'server_context'
 
 require 'async/http/cache/general'
 
-RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
-	include_context Async::HTTP::Server
-	
-	let(:server) do
-		Async::HTTP::Server.for(endpoint, protocol) do |request|
-			Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public']], ['Hello', ' ', 'World']]
-		end
-	end
-	
-	subject {described_class.new(client)}
-	let(:store) {subject.store.delegate}
-	
+RSpec.shared_examples_for Async::HTTP::Cache::General do
 	it "should cache GET requests" do
 		response = subject.get("/")
 		expect(response.read).to be == "Hello World"
@@ -43,7 +32,7 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 			expect(response.read).to be == "Hello World"
 		end
 		
-		expect(subject).to have_attributes(count: 10)
+		expect(cache).to have_attributes(count: 10)
 	end
 	
 	it "should cache HEAD requests" do
@@ -58,7 +47,7 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 			expect(response.read).to be_nil
 		end
 		
-		expect(subject).to have_attributes(count: 10)
+		expect(cache).to have_attributes(count: 10)
 	end
 	
 	it "should not cache POST requests" do
@@ -68,17 +57,23 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 		response = subject.post("/")
 		expect(response.read).to be == "Hello World"
 		
-		expect(subject).to have_attributes(count: 0)
+		expect(cache).to have_attributes(count: 0)
 	end
 	
 	context 'with varied response' do
-		let(:server) do
-			Async::HTTP::Server.for(endpoint, protocol) do |request|
-				if user_agent = request.headers['user-agent']
+		let(:app) do
+			Protocol::HTTP::Middleware.for do |request|
+				response = if user_agent = request.headers['user-agent']
 					Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public'], ['vary', 'user-agent']], [user_agent]]
 				else
 					Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public'], ['vary', 'user-agent']], ['Hello', ' ', 'World']]
 				end
+				
+				if request.head?
+					response.body = Protocol::HTTP::Body::Head.for(response.body)
+				end
+				
+				response
 			end
 		end
 		
@@ -104,16 +99,83 @@ RSpec.describe Async::HTTP::Cache::General, timeout: 5 do
 		it 'validate etag' do
 			# First, warm up the cache:
 			response = subject.get("/")
-			body = response.finish
-			
 			expect(response.headers).to_not include('etag')
-			
-			response = subject.get("/")
+			expect(response.read).to be == "Hello World"
 			expect(response.headers).to include('etag')
+			
 			etag = response.headers['etag']
 			
 			response = subject.get("/", {'if-none-match' => etag})
 			expect(response).to be_not_modified
 		end
+	end
+end
+
+RSpec.describe Async::HTTP::Cache::General do
+	include_context Async::HTTP::Server
+	
+	let(:app) do
+		Protocol::HTTP::Middleware.for do |request|
+			body = Async::HTTP::Body::Writable.new(11)
+			
+			Async do |task|
+				body.write "Hello"
+				body.write " "
+				task.yield
+				body.write "World"
+				body.close
+			rescue Async::HTTP::Body::Writable::Closed
+				# Ignore... probably head request.
+			end
+			
+			response = Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public']], body]
+			
+			if request.head?
+				response.body = Protocol::HTTP::Body::Head.for(response.body)
+			end
+			
+			response
+		end
+	end
+	
+	let(:server) do
+		Async::HTTP::Server.new(app, endpoint, protocol)
+	end
+	
+	let(:store) {cache.store.delegate}
+	
+	context 'with client-side cache' do
+		subject(:cache) {described_class.new(client)}
+		let(:store) {subject.store.delegate}
+		
+		include_examples Async::HTTP::Cache::General
+	end
+	
+	context 'with server-side cache via HTTP/1.1' do
+		let(:protocol) {Async::HTTP::Protocol::HTTP11}
+		
+		subject {client}
+		
+		let(:cache) {described_class.new(app)}
+		
+		let(:server) do
+			Async::HTTP::Server.new(cache, endpoint, protocol)
+		end
+		
+		include_examples Async::HTTP::Cache::General
+	end
+	
+	context 'with server-side cache via HTTP/2' do
+		let(:protocol) {Async::HTTP::Protocol::HTTP2}
+			
+		subject {client}
+		
+		let(:cache) {described_class.new(app)}
+		
+		let(:server) do
+			Async::HTTP::Server.new(cache, endpoint, protocol)
+		end
+		
+		include_examples Async::HTTP::Cache::General
 	end
 end

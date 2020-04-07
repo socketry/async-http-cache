@@ -46,20 +46,17 @@ module Async
 					)
 					
 					@max_age = @headers[CACHE_CONTROL]&.max_age
-					
-					if @body && @body.respond_to?(:digest)
-						@etag = @body.digest.dump
-						@headers.set(ETAG, @etag)
-					else
-						@etag = nil
-					end
+					@etag = nil
 					
 					@headers.set(X_SERVED_BY, 'Async::HTTP::Cache')
 					@headers.set(X_CACHE, 'hit')
 				end
 				
-				attr :etag
 				attr :generated_at
+				
+				def etag
+					@etag ||= @headers[ETAG]
+				end
 				
 				def cachable?
 					if cache_control = @headers[CACHE_CONTROL]
