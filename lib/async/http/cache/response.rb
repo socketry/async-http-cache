@@ -31,7 +31,6 @@ module Async
 				SET_COOKIE = 'set-cookie'
 				ETAG = 'etag'
 				
-				X_SERVED_BY = 'x-served-by'
 				X_CACHE = 'x-cache'
 				
 				def initialize(response, body)
@@ -40,7 +39,7 @@ module Async
 					super(
 						response.version,
 						response.status,
-						response.headers.dup,
+						response.headers.flatten,
 						body,
 						response.protocol
 					)
@@ -48,7 +47,6 @@ module Async
 					@max_age = @headers[CACHE_CONTROL]&.max_age
 					@etag = nil
 					
-					@headers.set(X_SERVED_BY, 'Async::HTTP::Cache')
 					@headers.set(X_CACHE, 'hit')
 				end
 				

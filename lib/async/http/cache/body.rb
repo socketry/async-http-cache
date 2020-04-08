@@ -28,6 +28,9 @@ module Async
 	module HTTP
 		module Cache
 			module Body
+				TRAILERS = 'trailers'
+				ETAG = 'etag'
+				
 				def self.wrap(response, &block)
 					if body = response.body
 						if body.empty?
@@ -37,13 +40,15 @@ module Async
 							# Insert a rewindable body so that we can cache the response body:
 							rewindable = ::Protocol::HTTP::Body::Rewindable.wrap(response)
 							
-							# Compute a digest and add it to the response headers:
-							::Protocol::HTTP::Body::Digestable.wrap(response) do |wrapper|
-								response.headers.add('etag', wrapper.etag)
+							unless response.headers.include?(ETAG)
+								# Compute a digest and add it to the response headers:
+								::Protocol::HTTP::Body::Digestable.wrap(response) do |wrapper|
+									response.headers.add(ETAG, wrapper.etag)
+								end
+								
+								# Ensure the etag is listed as a trailer:
+								response.headers.add(TRAILERS, ETAG)
 							end
-							
-							# Ensure the etag is listed as a trailer:
-							response.headers.add('trailers', 'etag')
 							
 							# Wrap the response with the callback:
 							::Protocol::HTTP::Body::Streamable.wrap(response) do |error|
