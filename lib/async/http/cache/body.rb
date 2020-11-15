@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 
 require 'protocol/http/body/rewindable'
-require 'protocol/http/body/streamable'
+require 'protocol/http/body/completable'
 require 'protocol/http/body/digestable'
 
 module Async
@@ -51,7 +51,7 @@ module Async
 							end
 							
 							# Wrap the response with the callback:
-							::Protocol::HTTP::Body::Streamable.wrap(response) do |error|
+							::Protocol::HTTP::Body::Completable.wrap(response) do |error|
 								if error
 									Async.logger.error(self) {error}
 								else
