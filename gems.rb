@@ -6,3 +6,8 @@ gemspec
 # gem "async-http", path: "../async-http"
 # gem "protocol-http", path: "../protocol-http"
 # gem "protocol-http1", path: "../protocol-http1"
+
+group :maintenance, optional: true do
+	gem "bake-modernize"
+	gem "bake-bundler"
+end

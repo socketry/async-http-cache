@@ -2,13 +2,13 @@
 
 Provides a cache middleware for `Async::HTTP` clients and servers.
 
-[![Development](https://github.com/socketry/async-http-cache/workflows/Development/badge.svg?branch=master)](https://github.com/socketry/async-http-cache/actions?workflow=Development)
+[![Development Status](https://github.com/socketry/async-http-cache/workflows/Development/badge.svg)](https://github.com/socketry/async-http-cache/actions?workflow=Development)
 
 ## Usage
 
 ### Client Side
 
-```ruby
+``` ruby
 require 'async'
 require 'async/http'
 require 'async/http/cache'
@@ -36,12 +36,11 @@ The `vary` header creates a headache for proxy implementations, because it creat
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
+1.  Fork it
+2.  Create your feature branch (`git checkout -b my-new-feature`)
+3.  Commit your changes (`git commit -am 'Add some feature'`)
+4.  Push to the branch (`git push origin my-new-feature`)
+5.  Create new Pull Request
 
 ## License
 
