@@ -139,7 +139,7 @@ RSpec.describe Async::HTTP::Cache::General do
 	end
 	
 	let(:server) do
-		Async::HTTP::Server.new(app, endpoint, protocol)
+		Async::HTTP::Server.new(app, endpoint, protocol: protocol)
 	end
 	
 	let(:store) {cache.store.delegate}
@@ -159,7 +159,7 @@ RSpec.describe Async::HTTP::Cache::General do
 		let(:cache) {described_class.new(app)}
 		
 		let(:server) do
-			Async::HTTP::Server.new(cache, endpoint, protocol)
+			Async::HTTP::Server.new(cache, endpoint, protocol: protocol)
 		end
 		
 		include_examples Async::HTTP::Cache::General
@@ -173,7 +173,7 @@ RSpec.describe Async::HTTP::Cache::General do
 		let(:cache) {described_class.new(app)}
 		
 		let(:server) do
-			Async::HTTP::Server.new(cache, endpoint, protocol)
+			Async::HTTP::Server.new(cache, endpoint, protocol: protocol)
 		end
 		
 		include_examples Async::HTTP::Cache::General

@@ -28,7 +28,7 @@ module Async
 	module HTTP
 		module Cache
 			module Body
-				TRAILERS = 'trailers'
+				TRAILER = 'trailer'
 				ETAG = 'etag'
 				
 				def self.wrap(response, &block)
@@ -47,7 +47,7 @@ module Async
 								end
 								
 								# Ensure the etag is listed as a trailer:
-								response.headers.add(TRAILERS, ETAG)
+								response.headers.add(TRAILER, ETAG)
 							end
 							
 							# Wrap the response with the callback:
