@@ -67,7 +67,7 @@ module Async
 					end
 					
 					if set_cookie = @headers[SET_COOKIE]
-						Async.logger.warn(self) {"Cannot cache response with set-cookie header!"}
+						Console.logger.warn(self) {"Cannot cache response with set-cookie header!"}
 						return false
 					end
 					

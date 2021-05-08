@@ -40,7 +40,7 @@ module Async
 								pruned = self.prune
 								@pruned += pruned
 								
-								Async.logger.debug(self) do |buffer|
+								Console.logger.debug(self) do |buffer|
 									if pruned > 0
 										buffer.puts "Pruned #{pruned} entries."
 									end

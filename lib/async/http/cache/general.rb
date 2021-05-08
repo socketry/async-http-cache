@@ -94,14 +94,14 @@ module Async
 					
 					if request.head? and body = response.body
 						unless body.empty?
-							Async.logger.warn(self) {"HEAD request resulted in non-empty body!"}
+							Console.logger.warn(self) {"HEAD request resulted in non-empty body!"}
 							
 							return response
 						end
 					end
 					
 					return Body.wrap(response) do |response, body|
-						Async.logger.debug(self) {"Updating cache for #{key}..."}
+						Console.logger.debug(self) {"Updating cache for #{key}..."}
 						@store.insert(key, request, Response.new(response, body))
 					end
 				end
@@ -113,7 +113,7 @@ module Async
 					
 					unless cache_control&.no_cache?
 						if response = @store.lookup(key, request)
-							Async.logger.debug(self) {"Cache hit for #{key}..."}
+							Console.logger.debug(self) {"Cache hit for #{key}..."}
 							@count += 1
 							
 							# Return the cached response:

@@ -53,7 +53,7 @@ module Async
 							# Wrap the response with the callback:
 							::Protocol::HTTP::Body::Completable.wrap(response) do |error|
 								if error
-									Async.logger.error(self) {error}
+									Console.logger.error(self) {error}
 								else
 									yield response, rewindable.buffered
 								end
