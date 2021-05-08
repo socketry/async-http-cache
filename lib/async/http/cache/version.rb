@@ -23,7 +23,7 @@
 module Async
 	module HTTP
 		module Cache
-			VERSION = "0.4.0"
+			VERSION = "0.4.1"
 		end
 	end
 end
