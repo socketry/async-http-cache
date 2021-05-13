@@ -33,7 +33,7 @@ module Async
 						@miss = 0
 						@pruned = 0
 						
-						@gardener = Async do |task|
+						@gardener = Async(transient: true, annotation: self.class) do |task|
 							while true
 								task.sleep(60)
 								
