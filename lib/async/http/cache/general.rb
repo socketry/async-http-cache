@@ -100,9 +100,9 @@ module Async
 						end
 					end
 					
-					return Body.wrap(response) do |response, body|
+					return Body.wrap(response) do |the_response, the_body|
 						Console.logger.debug(self) {"Updating cache for #{key}..."}
-						@store.insert(key, request, Response.new(response, body))
+						@store.insert(key, request, Response.new(the_response, the_body))
 					end
 				end
 				
