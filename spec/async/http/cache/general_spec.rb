@@ -105,8 +105,7 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
         end
       end
 
-      # [200, 203, 300, 301, 302, 404, 410].each do |response_code|
-      [200].each do |response_code|
+      [200, 203, 300, 301, 302, 404, 410].each do |response_code|
         context "when cacheable: #{response_code}" do
           let(:response_code) {response_code}
 

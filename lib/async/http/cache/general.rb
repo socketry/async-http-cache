@@ -20,12 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'set'
 require 'protocol/http/middleware'
 
 require_relative 'body'
 require_relative 'response'
 require_relative 'store'
 
+# Note: caching rules here are adapted from https://github.com/rtomayko/rack-cache
 module Async
 	module HTTP
 		module Cache
@@ -35,6 +37,20 @@ module Async
 				CONTENT_TYPE = 'content-type'
 				AUTHORIZATION = 'authorization'
 				COOKIE = 'cookie'
+
+        # Status codes of responses that MAY be stored by a cache or used in reply
+        # to a subsequent request.
+        #
+        # http://tools.ietf.org/html/rfc2616#section-13.4
+        CACHEABLE_RESPONSE_CODES = [
+          200, # OK
+          203, # Non-Authoritative Information
+          300, # Multiple Choices
+          301, # Moved Permanently
+          302, # Found
+          404, # Not Found
+          410  # Gone
+        ].to_set.freeze
 
 				def initialize(app, store: Store.default)
 					super(app)
@@ -88,9 +104,9 @@ module Async
 				end
 
 				def wrap(key, request, response)
-					if response.status != 200
+          unless CACHEABLE_RESPONSE_CODES.include?(response.status)
 						return response
-          end
+					end
 
           response_cache_control = response.headers[CACHE_CONTROL]
 
