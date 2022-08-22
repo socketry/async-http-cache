@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require_relative "lib/async/http/cache/version"
 
@@ -6,8 +7,11 @@ Gem::Specification.new do |spec|
 	spec.version = Async::HTTP::Cache::VERSION
 	
 	spec.summary = "Standard-compliant cache for async-http."
-	spec.authors = ["Samuel Williams"]
+	spec.authors = ["Samuel Williams", "Olle Jonsson"]
 	spec.license = "MIT"
+	
+	spec.cert_chain  = ['release.cert']
+	spec.signing_key = File.expand_path('~/.gem/release.pem')
 	
 	spec.homepage = "https://github.com/socketry/async-http-cache"
 	
