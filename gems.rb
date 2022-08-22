@@ -8,6 +8,11 @@ gemspec
 # gem "protocol-http1", path: "../protocol-http1"
 
 group :maintenance, optional: true do
+	gem "bake-gem"
 	gem "bake-modernize"
-	gem "bake-bundler"
+end
+
+group :test do
+	gem "bake-test"
+	gem "bake-test-external"
 end
