@@ -2,7 +2,7 @@
 
 Provides a cache middleware for `Async::HTTP` clients and servers.
 
-[![Development Status](https://github.com/socketry/async-http-cache/workflows/Development/badge.svg)](https://github.com/socketry/async-http-cache/actions?workflow=Development)
+[![Development Status](https://github.com/socketry/async-http-cache/workflows/Test/badge.svg)](https://github.com/socketry/async-http-cache/actions?workflow=Test)
 
 ## Usage
 
