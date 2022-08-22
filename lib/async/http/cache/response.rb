@@ -56,7 +56,7 @@ module Async
 					@etag ||= @headers[ETAG]
 				end
 				
-				def cachable?
+				def cacheable?
 					if cache_control = @headers[CACHE_CONTROL]
 						if cache_control.private? || !cache_control.public?
 							return false
