@@ -27,7 +27,6 @@ require_relative 'body'
 require_relative 'response'
 require_relative 'store'
 
-# Note: caching rules here are adapted from https://github.com/rtomayko/rack-cache
 module Async
 	module HTTP
 		module Cache
@@ -42,15 +41,15 @@ module Async
 				# to a subsequent request.
 				#
 				# http://tools.ietf.org/html/rfc2616#section-13.4
-				CACHEABLE_RESPONSE_CODES = [
-					200, # OK
-					203, # Non-Authoritative Information
-					300, # Multiple Choices
-					301, # Moved Permanently
-					302, # Found
-					404, # Not Found
-					410  # Gone
-				].to_set.freeze
+				CACHEABLE_RESPONSE_CODES = {
+					200 => true, # OK
+					203 => true, # Non-Authoritative Information
+					300 => true, # Multiple Choices
+					301 => true, # Moved Permanently
+					302 => true, # Found
+					404 => true, # Not Found
+					410 => true  # Gone
+				}.freeze
 
 				def initialize(app, store: Store.default)
 					super(app)
