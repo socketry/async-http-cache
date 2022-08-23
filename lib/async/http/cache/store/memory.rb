@@ -25,9 +25,10 @@ module Async
 		module Cache
 			module Store
 				class Memory
-					def initialize(limit: 1024)
+					def initialize(limit: 1024, maximum_size: 1024*64, prune_interval: 60)
 						@index = {}
 						@limit = limit
+						@maximum_size = maximum_size
 						
 						@hit = 0
 						@miss = 0
@@ -35,7 +36,7 @@ module Async
 						
 						@gardener = Async(transient: true, annotation: self.class) do |task|
 							while true
-								task.sleep(60)
+								task.sleep(prune_interval)
 								
 								pruned = self.prune
 								@pruned += pruned
@@ -96,7 +97,7 @@ module Async
 					def insert(key, request, response)
 						if @index.size < @limit
 							length = response.body&.length
-							if length.nil? or length < 1024*64
+							if length.nil? or length < @maximum_size
 								@index[key] = response
 							end
 						end
