@@ -95,76 +95,76 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 
 			expect(store.index.size).to eq(2)
 		end
-  end
+	end
 
-  context 'cache writes' do
-    context 'by response code' do
-      let(:app) do
-        Protocol::HTTP::Middleware.for do |_request|
-          Protocol::HTTP::Response[response_code, [], ['body']]
-        end
-      end
+	context 'cache writes' do
+		context 'by response code' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |_request|
+					Protocol::HTTP::Response[response_code, [], ['body']]
+				end
+			end
 
-      [200, 203, 300, 301, 302, 404, 410].each do |response_code|
-        context "when cacheable: #{response_code}" do
-          let(:response_code) {response_code}
+			[200, 203, 300, 301, 302, 404, 410].each do |response_code|
+				context "when cacheable: #{response_code}" do
+					let(:response_code) {response_code}
 
-          it 'is cached' do
-            responses = 2.times.map {subject.get("/", {})}
-            headers = responses.map {|r| r.headers.to_h}
+					it 'is cached' do
+						responses = 2.times.map {subject.get("/", {})}
+						headers = responses.map {|r| r.headers.to_h}
 
-            expect(headers).to eq([{}, {"x-cache"=>["hit"]}])
-          end
-        end
-      end
+						expect(headers).to eq([{}, {"x-cache"=>["hit"]}])
+					end
+				end
+			end
 
-      [202, 303, 400, 403, 500, 503].each do |response_code|
-        context "when not cacheable: #{response_code}" do
-          let(:response_code) {response_code}
+			[202, 303, 400, 403, 500, 503].each do |response_code|
+				context "when not cacheable: #{response_code}" do
+					let(:response_code) {response_code}
 
-          it 'is not cached' do
-            responses = 2.times.map {subject.get("/", {})}
-            response_headers = responses.map {|r| r.headers.to_h}
+					it 'is not cached' do
+						responses = 2.times.map {subject.get("/", {})}
+						response_headers = responses.map {|r| r.headers.to_h}
 
-            expect(response_headers).to eq([{}, {}]) # no x-cache: hit
-          end
-        end
-      end
-    end
+						expect(response_headers).to eq([{}, {}]) # no x-cache: hit
+					end
+				end
+			end
+		end
 
-    context 'by cache-control: flag' do
-      let(:app) do
-        Protocol::HTTP::Middleware.for do |_request|
-          Protocol::HTTP::Response[200, headers] # no body?
-        end
-      end
+		context 'by cache-control: flag' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |_request|
+					Protocol::HTTP::Response[200, headers] # no body?
+				end
+			end
 
-      ['no-store', 'private'].each do |flag|
-        let(:headers) {[['cache-control', flag]]}
-        let(:headers_hash) {Hash[headers.map {|k, v| [k, [v]]}]}
+			['no-store', 'private'].each do |flag|
+				let(:headers) {[['cache-control', flag]]}
+				let(:headers_hash) {Hash[headers.map {|k, v| [k, [v]]}]}
 
-        context "when not cacheable #{flag}" do
-          it 'is not cached' do
-            responses = 2.times.map {subject.get("/", {})}
-            response_headers = responses.map {|r| r.headers.to_h}
+				context "when not cacheable #{flag}" do
+					it 'is not cached' do
+						responses = 2.times.map {subject.get("/", {})}
+						response_headers = responses.map {|r| r.headers.to_h}
 
-            expect(response_headers).to eq([headers_hash, headers_hash]) # no x-cache: hit
-          end
-        end
-      end
+						expect(response_headers).to eq([headers_hash, headers_hash]) # no x-cache: hit
+					end
+				end
+			end
 
-      context 'when cacheable' do
-        let(:headers) {[]}
+			context 'when cacheable' do
+				let(:headers) {[]}
 
-        it 'is cached' do
-          responses = 2.times.map { subject.get("/", {}) }
-          headers = responses.map {|r| r.headers.to_h}
+				it 'is cached' do
+					responses = 2.times.map { subject.get("/", {}) }
+					headers = responses.map {|r| r.headers.to_h}
 
-          expect(headers).to eq([{}, {"x-cache"=>["hit"]}])
-        end
-      end
-    end
-  end
+					expect(headers).to eq([{}, {"x-cache"=>["hit"]}])
+				end
+			end
+		end
+	end
 
 	context 'with if-none-match' do
 		it 'validate etag' do
