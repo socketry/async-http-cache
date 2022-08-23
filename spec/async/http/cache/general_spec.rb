@@ -110,10 +110,11 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 					let(:response_code) {response_code}
 
 					it 'is cached' do
-						responses = 2.times.map {subject.get("/", {})}
+						responses = 2.times.map {subject.get("/", {}).tap(&:finish)}
 						headers = responses.map {|r| r.headers.to_h}
 
-						expect(headers).to be == [{}, {"x-cache"=>["hit"]}]
+						expect(headers.first).not_to include('x-cache')
+						expect(headers.last).to include('x-cache' => ['hit'])
 					end
 				end
 			end
@@ -123,7 +124,7 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 					let(:response_code) {response_code}
 
 					it 'is not cached' do
-						responses = 2.times.map {subject.get("/", {})}
+						responses = 2.times.map {subject.get("/", {}).tap(&:finish)}
 						response_headers = responses.map {|r| r.headers.to_h}
 
 						expect(response_headers).to be == [{}, {}] # no x-cache: hit
@@ -145,7 +146,7 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 
 				context "when not cacheable #{flag}" do
 					it 'is not cached' do
-						responses = 2.times.map {subject.get("/", {})}
+						responses = 2.times.map {subject.get("/", {}).tap(&:finish)}
 						response_headers = responses.map {|r| r.headers.to_h}
 
 						expect(response_headers).to be == [headers_hash, headers_hash] # no x-cache: hit
@@ -157,7 +158,7 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 				let(:headers) {[]}
 
 				it 'is cached' do
-					responses = 2.times.map { subject.get("/", {}) }
+					responses = 2.times.map {subject.get("/", {}).tap(&:finish)}
 					headers = responses.map {|r| r.headers.to_h}
 
 					expect(headers).to be == [{}, {"x-cache"=>["hit"]}]
@@ -209,10 +210,6 @@ RSpec.describe Async::HTTP::Cache::General do
 		end
 	end
 
-	let(:server) do
-		Async::HTTP::Server.new(app, endpoint, protocol: protocol)
-	end
-
 	let(:store) {cache.store.delegate}
 
 	context 'with client-side cache' do
@@ -228,10 +225,7 @@ RSpec.describe Async::HTTP::Cache::General do
 		subject {client}
 
 		let(:cache) {described_class.new(app)}
-
-		let(:server) do
-			Async::HTTP::Server.new(cache, endpoint, protocol: protocol)
-		end
+		let(:middleware) {cache}
 
 		include_examples Async::HTTP::Cache::General
 	end
@@ -242,10 +236,7 @@ RSpec.describe Async::HTTP::Cache::General do
 		subject {client}
 
 		let(:cache) {described_class.new(app)}
-
-		let(:server) do
-			Async::HTTP::Server.new(cache, endpoint, protocol: protocol)
-		end
+		let(:middleware) {cache}
 
 		include_examples Async::HTTP::Cache::General
 	end
