@@ -89,11 +89,11 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 				user_agents.each do |user_agent|
 					response = subject.get("/", {'user-agent' => user_agent})
 					expect(response.headers['vary']).to include('user-agent')
-					expect(response.read).to eq(user_agent)
+					expect(response.read).to be == user_agent
 				end
 			end
 
-			expect(store.index.size).to eq(2)
+			expect(store.index.size).to be == 2
 		end
 	end
 
@@ -113,7 +113,7 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 						responses = 2.times.map {subject.get("/", {})}
 						headers = responses.map {|r| r.headers.to_h}
 
-						expect(headers).to eq([{}, {"x-cache"=>["hit"]}])
+						expect(headers).to be == [{}, {"x-cache"=>["hit"]}]
 					end
 				end
 			end
@@ -126,7 +126,7 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 						responses = 2.times.map {subject.get("/", {})}
 						response_headers = responses.map {|r| r.headers.to_h}
 
-						expect(response_headers).to eq([{}, {}]) # no x-cache: hit
+						expect(response_headers).to be == [{}, {}] # no x-cache: hit
 					end
 				end
 			end
@@ -148,7 +148,7 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 						responses = 2.times.map {subject.get("/", {})}
 						response_headers = responses.map {|r| r.headers.to_h}
 
-						expect(response_headers).to eq([headers_hash, headers_hash]) # no x-cache: hit
+						expect(response_headers).to be == [headers_hash, headers_hash] # no x-cache: hit
 					end
 				end
 			end
@@ -160,7 +160,7 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
 					responses = 2.times.map { subject.get("/", {}) }
 					headers = responses.map {|r| r.headers.to_h}
 
-					expect(headers).to eq([{}, {"x-cache"=>["hit"]}])
+					expect(headers).to be == [{}, {"x-cache"=>["hit"]}]
 				end
 			end
 		end
