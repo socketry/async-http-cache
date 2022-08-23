@@ -101,7 +101,7 @@ RSpec.shared_examples_for Async::HTTP::Cache::General do
     context 'by response code' do
       let(:app) do
         Protocol::HTTP::Middleware.for do |_request|
-          Protocol::HTTP::Response[response_code, []] # no response body?
+          Protocol::HTTP::Response[response_code, [], ['body']]
         end
       end
 
