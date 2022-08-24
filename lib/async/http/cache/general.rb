@@ -30,6 +30,7 @@ require_relative 'store'
 module Async
 	module HTTP
 		module Cache
+			# Implements a general shared cache according to https://www.rfc-editor.org/rfc/rfc9111
 			class General < ::Protocol::HTTP::Middleware
 				CACHE_CONTROL  = 'cache-control'
 				
