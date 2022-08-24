@@ -28,7 +28,6 @@ module Async
 		module Cache
 			class Response < ::Protocol::HTTP::Response
 				CACHE_CONTROL = 'cache-control'
-				SET_COOKIE = 'set-cookie'
 				ETAG = 'etag'
 				
 				X_CACHE = 'x-cache'
@@ -54,24 +53,6 @@ module Async
 				
 				def etag
 					@etag ||= @headers[ETAG]
-				end
-				
-				def cacheable?
-					if cache_control = @headers[CACHE_CONTROL]
-						if cache_control.private? || !cache_control.public?
-							return false
-						end
-					else
-						# No cache control header...
-						return false
-					end
-					
-					if set_cookie = @headers[SET_COOKIE]
-						Console.logger.warn(self) {"Cannot cache response with set-cookie header!"}
-						return false
-					end
-					
-					return true
 				end
 				
 				def age
