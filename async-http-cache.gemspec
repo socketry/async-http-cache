@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
 	
 	spec.add_dependency "async-http", ">= 0.65"
 	
+  spec.add_development_dependency "io-endpoint"
 	spec.add_development_dependency "async-rspec", "~> 1.10"
 	spec.add_development_dependency "covered"
 	spec.add_development_dependency "rspec"

@@ -23,7 +23,12 @@
 require 'async/http/server'
 require 'async/http/client'
 require 'async/http/endpoint'
-require 'async/io/shared_endpoint'
+
+require 'io/endpoint'
+require 'io/endpoint/host_endpoint'
+require 'io/endpoint/ssl_endpoint'
+require "io/endpoint/bound_endpoint"
+require "io/endpoint/connected_endpoint"
 
 RSpec.shared_context Async::HTTP::Server do
 	include_context Async::RSpec::Reactor
@@ -47,7 +52,7 @@ RSpec.shared_context Async::HTTP::Server do
 	
 	before do
 		# We bind the endpoint before running the server so that we know incoming connections will be accepted:
-		@bound_endpoint = Async::IO::SharedEndpoint.bound(endpoint)
+    @bound_endpoint = IO::Endpoint::BoundEndpoint.bound(endpoint)
 		
 		# I feel a dedicated class might be better than this hack:
 		allow(@bound_endpoint).to receive(:protocol).and_return(endpoint.protocol)
