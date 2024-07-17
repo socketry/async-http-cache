@@ -13,3 +13,6 @@
 .covered.db
 
 /external
+
+# for easier future development
+vendor/bundle
