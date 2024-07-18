@@ -24,6 +24,9 @@ group :test do
 	gem "covered"
 	gem "decode"
 	
+	gem "sus-fixtures-async-http"
+	gem "sus-fixtures-console"
+	
 	gem "bake-test"
 	gem "bake-test-external"
 end

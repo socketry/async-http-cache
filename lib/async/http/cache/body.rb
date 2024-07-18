@@ -7,6 +7,9 @@ require 'protocol/http/body/rewindable'
 require 'protocol/http/body/completable'
 require 'protocol/http/body/digestable'
 
+require 'console'
+require 'console/event/failure'
+
 module Async
 	module HTTP
 		module Cache
@@ -36,7 +39,7 @@ module Async
 							# Wrap the response with the callback:
 							::Protocol::HTTP::Body::Completable.wrap(response) do |error|
 								if error
-									Console.logger.error(self) {error}
+									Console::Event::Failure.for(error).emit(self)
 								else
 									yield response, rewindable.buffered
 								end
