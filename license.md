@@ -1,6 +1,8 @@
 # MIT License
 
-Copyright, 2020-2021, by Samuel Williams.  
+Copyright, 2020-2022, by Samuel Williams.  
+Copyright, 2021, by Olle Jonsson.  
+Copyright, 2022, by Colin Kelley.  
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

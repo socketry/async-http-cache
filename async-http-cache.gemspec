@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
 	spec.version = Async::HTTP::Cache::VERSION
 	
 	spec.summary = "Standard-compliant cache for async-http."
-	spec.authors = ["Samuel Williams", "Olle Jonsson"]
+	spec.authors = ["Samuel Williams", "Colin Kelley", "Olle Jonsson"]
 	spec.license = "MIT"
 	
 	spec.cert_chain  = ['release.cert']
@@ -15,13 +15,13 @@ Gem::Specification.new do |spec|
 	
 	spec.homepage = "https://github.com/socketry/async-http-cache"
 	
-	spec.files = Dir.glob('{lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
+	spec.metadata = {
+		"source_code_uri" => "https://github.com/socketry/async-http-cache.git",
+	}
 	
-	spec.required_ruby_version = ">= 2.3.0"
+	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
+	
+	spec.required_ruby_version = ">= 3.1"
 	
 	spec.add_dependency "async-http", "~> 0.56"
-	
-	spec.add_development_dependency "async-rspec", "~> 1.10"
-	spec.add_development_dependency "covered"
-	spec.add_development_dependency "rspec"
 end
