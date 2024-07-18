@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2020-2022, by Samuel Williams.
-# Copyright, 2022, by Colin Kelley.
+# Copyright, 2024, by Samuel Williams.
 
 require 'sus/fixtures/async/http'
 require 'async/http/cache/a_general_cache'
