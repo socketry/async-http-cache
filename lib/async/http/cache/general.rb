@@ -4,24 +4,24 @@
 # Copyright, 2020-2024, by Samuel Williams.
 # Copyright, 2022, by Colin Kelley.
 
-require 'set'
-require 'protocol/http/middleware'
+require "set"
+require "protocol/http/middleware"
 
-require_relative 'body'
-require_relative 'response'
-require_relative 'store'
+require_relative "body"
+require_relative "response"
+require_relative "store"
 
 module Async
 	module HTTP
 		module Cache
 			# Implements a general shared cache according to https://www.rfc-editor.org/rfc/rfc9111
 			class General < ::Protocol::HTTP::Middleware
-				CACHE_CONTROL  = 'cache-control'
+				CACHE_CONTROL  = "cache-control"
 				
-				CONTENT_TYPE = 'content-type'
-				AUTHORIZATION = 'authorization'
-				COOKIE = 'cookie'
-				SET_COOKIE = 'set-cookie'
+				CONTENT_TYPE = "content-type"
+				AUTHORIZATION = "authorization"
+				COOKIE = "cookie"
+				SET_COOKIE = "set-cookie"
 				
 				# Status codes of responses that MAY be stored by a cache or used in reply
 				# to a subsequent request.
@@ -72,7 +72,7 @@ module Async
 					end
 					
 					# We only support caching GET and HEAD requests:
-					unless request.method == 'GET' || request.method == 'HEAD'
+					unless request.method == "GET" || request.method == "HEAD"
 						return false
 					end
 					
@@ -111,7 +111,7 @@ module Async
 						Console.logger.debug(self, status: response.status) {"Cannot cache response with status code!"}
 						return false
 					end
-
+					
 					unless cacheable_response_headers?(response.headers)
 						Console.logger.debug(self) {"Cannot cache response with uncacheable headers!"}
 						return false
@@ -137,7 +137,7 @@ module Async
 					if request.head? and body = response.body
 						unless body.empty?
 							Console.logger.warn(self) {"HEAD request resulted in non-empty body!"}
-
+							
 							return response
 						end
 					end
@@ -161,7 +161,7 @@ module Async
 						end
 					end
 				end
-
+				
 				def call(request)
 					cache_control = request.headers[CACHE_CONTROL]
 					

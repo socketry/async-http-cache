@@ -3,8 +3,8 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-require_relative 'store/memory'
-require_relative 'store/vary'
+require_relative "store/memory"
+require_relative "store/vary"
 
 module Async
 	module HTTP

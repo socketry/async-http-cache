@@ -4,7 +4,7 @@
 # Copyright, 2020-2024, by Samuel Williams.
 # Copyright, 2022, by Colin Kelley.
 
-require 'async/http/cache/general'
+require "async/http/cache/general"
 
 module Async::HTTP::Cache
 	AGeneralCache = Sus::Shared("a general cache") do
@@ -50,13 +50,13 @@ module Async::HTTP::Cache
 			expect(cache).to have_attributes(count: be == 0)
 		end
 		
-		with 'varied response' do
+		with "varied response" do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
-					response = if user_agent = request.headers['user-agent']
-						Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public'], ['vary', 'user-agent']], [user_agent]]
+					response = if user_agent = request.headers["user-agent"]
+						Protocol::HTTP::Response[200, [["cache-control", "max-age=1, public"], ["vary", "user-agent"]], [user_agent]]
 					else
-						Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public'], ['vary', 'user-agent']], ['Hello', ' ', 'World']]
+						Protocol::HTTP::Response[200, [["cache-control", "max-age=1, public"], ["vary", "user-agent"]], ["Hello", " ", "World"]]
 					end
 					
 					if request.head?
@@ -68,15 +68,15 @@ module Async::HTTP::Cache
 			end
 			
 			let(:user_agents) {[
-				'test-a',
-				'test-b',
+				"test-a",
+				"test-b",
 			]}
 			
 			it "should cache GET requests" do
 				2.times do
 					user_agents.each do |user_agent|
-						response = client.get("/", {'user-agent' => user_agent})
-						expect(response.headers['vary']).to be(:include?, 'user-agent')
+						response = client.get("/", {"user-agent" => user_agent})
+						expect(response.headers["vary"]).to be(:include?, "user-agent")
 						expect(response.read).to be == user_agent
 					end
 				end
@@ -85,11 +85,11 @@ module Async::HTTP::Cache
 			end
 		end
 		
-		with 'cache writes' do
-			with 'response code' do
+		with "cache writes" do
+			with "response code" do
 				let(:app) do
 					Protocol::HTTP::Middleware.for do |_request|
-						Protocol::HTTP::Response[response_code, [], ['body']]
+						Protocol::HTTP::Response[response_code, [], ["body"]]
 					end
 				end
 				
@@ -97,12 +97,12 @@ module Async::HTTP::Cache
 					with "cacheable response code #{response_code}", unique: "status-#{response_code}" do
 						let(:response_code) {response_code}
 					
-						it 'is cached' do
+						it "is cached" do
 							responses = 2.times.map {client.get("/", {}).tap(&:finish)}
 							headers = responses.map {|r| r.headers.to_h}
 							
-							expect(headers.first).not.to be(:include?, 'x-cache')
-							expect(headers.last).to have_keys('x-cache' => be == ['hit'])
+							expect(headers.first).not.to be(:include?, "x-cache")
+							expect(headers.last).to have_keys("x-cache" => be == ["hit"])
 						end
 					end
 				end
@@ -111,7 +111,7 @@ module Async::HTTP::Cache
 					with "not cacheable response code #{response_code}", unique: "status-#{response_code}" do
 						let(:response_code) {response_code}
 						
-						it 'is not cached' do
+						it "is not cached" do
 							responses = 2.times.map {client.get("/", {}).tap(&:finish)}
 							response_headers = responses.map {|r| r.headers.to_h}
 							
@@ -121,19 +121,19 @@ module Async::HTTP::Cache
 				end
 			end
 			
-			with 'by cache-control: flag' do
+			with "by cache-control: flag" do
 				let(:app) do
 					Protocol::HTTP::Middleware.for do |_request|
 						Protocol::HTTP::Response[200, headers] # no body?
 					end
 				end
 				
-				['no-store', 'private'].each do |flag|
-					let(:headers) {[['cache-control', flag]]}
+				["no-store", "private"].each do |flag|
+					let(:headers) {[["cache-control", flag]]}
 					let(:headers_hash) {Hash[headers.map {|k, v| [k, [v]]}]}
 					
 					with "not cacheable response #{flag}", unique: flag do
-						it 'is not cached' do
+						it "is not cached" do
 							responses = 2.times.map {client.get("/", {}).tap(&:finish)}
 							response_headers = responses.map {|r| r.headers.to_h}
 							
@@ -142,10 +142,10 @@ module Async::HTTP::Cache
 					end
 				end
 				
-				with 'cacheable response' do
+				with "cacheable response" do
 					let(:headers) {[]}
 					
-					it 'is cached' do
+					it "is cached" do
 						responses = 2.times.map {client.get("/", {}).tap(&:finish)}
 						headers = responses.map {|r| r.headers.to_h}
 						
@@ -155,17 +155,17 @@ module Async::HTTP::Cache
 			end
 		end
 		
-		with 'if-none-match' do
-			it 'validate etag' do
+		with "if-none-match" do
+			it "validate etag" do
 				# First, warm up the cache:
 				response = client.get("/")
-				expect(response.headers).not.to be(:include?, 'etag')
+				expect(response.headers).not.to be(:include?, "etag")
 				expect(response.read).to be == "Hello World"
-				expect(response.headers).to be(:include?, 'etag')
+				expect(response.headers).to be(:include?, "etag")
 				
-				etag = response.headers['etag']
+				etag = response.headers["etag"]
 				
-				response = client.get("/", {'if-none-match' => etag})
+				response = client.get("/", {"if-none-match" => etag})
 				expect(response).to be(:not_modified?)
 			end
 		end

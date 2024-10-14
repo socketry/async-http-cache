@@ -3,17 +3,17 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-require 'protocol/http/response'
-require 'async/clock'
+require "protocol/http/response"
+require "async/clock"
 
 module Async
 	module HTTP
 		module Cache
 			class Response < ::Protocol::HTTP::Response
-				CACHE_CONTROL = 'cache-control'
-				ETAG = 'etag'
+				CACHE_CONTROL = "cache-control"
+				ETAG = "etag"
 				
-				X_CACHE = 'x-cache'
+				X_CACHE = "x-cache"
 				
 				def initialize(response, body)
 					@generated_at = Async::Clock.now
@@ -29,7 +29,7 @@ module Async
 					@max_age = @headers[CACHE_CONTROL]&.max_age
 					@etag = nil
 					
-					@headers.set(X_CACHE, 'hit')
+					@headers.set(X_CACHE, "hit")
 				end
 				
 				attr :generated_at

@@ -7,8 +7,8 @@ module Async
 	module HTTP
 		module Cache
 			module Store
-				VARY = 'vary'
-				ACCEPT_ENCODING = 'accept-encoding'
+				VARY = "vary"
+				ACCEPT_ENCODING = "accept-encoding"
 				
 				class Vary
 					def initialize(delegate, vary = {})

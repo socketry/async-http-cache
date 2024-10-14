@@ -48,7 +48,7 @@ module Async
 					
 					attr :index
 					
-					IF_NONE_MATCH = 'if-none-match'
+					IF_NONE_MATCH = "if-none-match"
 					NOT_MODIFIED = ::Protocol::HTTP::Response[304]
 					
 					def lookup(key, request)

@@ -3,8 +3,8 @@
 # Released under the MIT License.
 # Copyright, 2024, by Samuel Williams.
 
-require 'sus/fixtures/async/http'
-require 'async/http/cache/a_general_cache'
+require "sus/fixtures/async/http"
+require "async/http/cache/a_general_cache"
 
 describe Async::HTTP::Cache::General do
 	include Sus::Fixtures::Async::HTTP::ServerContext
@@ -23,7 +23,7 @@ describe Async::HTTP::Cache::General do
 				# Ignore... probably head request.
 			end
 			
-			response = Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public']], body]
+			response = Protocol::HTTP::Response[200, [["cache-control", "max-age=1, public"]], body]
 			
 			if request.head?
 				response.body = Protocol::HTTP::Body::Head.for(response.body)
@@ -35,7 +35,7 @@ describe Async::HTTP::Cache::General do
 	
 	let(:store) {cache.store.delegate}
 	
-	with 'client-side cache' do
+	with "client-side cache" do
 		let(:cache) {subject.new(@client)}
 		alias client cache
 		
@@ -44,7 +44,7 @@ describe Async::HTTP::Cache::General do
 		it_behaves_like Async::HTTP::Cache::AGeneralCache
 	end
 	
-	with 'server-side cache via HTTP/1.1' do
+	with "server-side cache via HTTP/1.1" do
 		let(:protocol) {Async::HTTP::Protocol::HTTP11}
 		
 		let(:cache) {subject.new(app)}
@@ -53,7 +53,7 @@ describe Async::HTTP::Cache::General do
 		it_behaves_like Async::HTTP::Cache::AGeneralCache
 	end
 	
-	with 'server-side cache via HTTP/2' do
+	with "server-side cache via HTTP/2" do
 		let(:protocol) {Async::HTTP::Protocol::HTTP2}
 		
 		let(:cache) {subject.new(app)}

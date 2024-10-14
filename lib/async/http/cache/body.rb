@@ -3,19 +3,19 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-require 'protocol/http/body/rewindable'
-require 'protocol/http/body/completable'
-require 'protocol/http/body/digestable'
+require "protocol/http/body/rewindable"
+require "protocol/http/body/completable"
+require "protocol/http/body/digestable"
 
-require 'console'
-require 'console/event/failure'
+require "console"
+require "console/event/failure"
 
 module Async
 	module HTTP
 		module Cache
 			module Body
-				TRAILER = 'trailer'
-				ETAG = 'etag'
+				TRAILER = "trailer"
+				ETAG = "etag"
 				
 				def self.wrap(response, &block)
 					if body = response.body

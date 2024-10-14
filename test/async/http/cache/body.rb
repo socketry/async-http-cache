@@ -3,10 +3,10 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-require 'async/http/cache/body'
-require 'protocol/http'
+require "async/http/cache/body"
+require "protocol/http"
 
-require 'sus/fixtures/console'
+require "sus/fixtures/console"
 
 describe Async::HTTP::Cache::Body do
 	include_context Sus::Fixtures::Console::CapturedLogger
