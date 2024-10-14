@@ -94,7 +94,7 @@ module Async::HTTP::Cache
 				end
 				
 				[200, 203, 300, 301, 302, 404, 410].each do |response_code|
-					with "cacheable response code #{response_code}" do
+					with "cacheable response code #{response_code}", unique: "status-#{response_code}" do
 						let(:response_code) {response_code}
 					
 						it 'is cached' do
@@ -108,7 +108,7 @@ module Async::HTTP::Cache
 				end
 				
 				[202, 303, 400, 403, 500, 503].each do |response_code|
-					with "not cacheable response code #{response_code}" do
+					with "not cacheable response code #{response_code}", unique: "status-#{response_code}" do
 						let(:response_code) {response_code}
 						
 						it 'is not cached' do
@@ -132,7 +132,7 @@ module Async::HTTP::Cache
 					let(:headers) {[['cache-control', flag]]}
 					let(:headers_hash) {Hash[headers.map {|k, v| [k, [v]]}]}
 					
-					with "not cacheable response #{flag}" do
+					with "not cacheable response #{flag}", unique: flag do
 						it 'is not cached' do
 							responses = 2.times.map {client.get("/", {}).tap(&:finish)}
 							response_headers = responses.map {|r| r.headers.to_h}

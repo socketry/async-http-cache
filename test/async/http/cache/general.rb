@@ -18,23 +18,23 @@ describe Async::HTTP::Cache::General do
 				body.write " "
 				task.yield
 				body.write "World"
-				body.close
+				body.close_write
 			rescue Async::HTTP::Body::Writable::Closed
 				# Ignore... probably head request.
 			end
-
+			
 			response = Protocol::HTTP::Response[200, [['cache-control', 'max-age=1, public']], body]
-
+			
 			if request.head?
 				response.body = Protocol::HTTP::Body::Head.for(response.body)
 			end
-
+			
 			response
 		end
 	end
-
+	
 	let(:store) {cache.store.delegate}
-
+	
 	with 'client-side cache' do
 		let(:cache) {subject.new(@client)}
 		alias client cache
