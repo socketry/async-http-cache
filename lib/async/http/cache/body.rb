@@ -27,13 +27,13 @@ module Async
 							rewindable = ::Protocol::HTTP::Body::Rewindable.wrap(response)
 							
 							unless response.headers.include?(ETAG)
+								# Add the etag header to the trailers:
+								response.headers.add(TRAILER, ETAG)
+								
 								# Compute a digest and add it to the response headers:
 								::Protocol::HTTP::Body::Digestable.wrap(response) do |wrapper|
 									response.headers.add(ETAG, wrapper.etag)
 								end
-								
-								# Ensure the etag is listed as a trailer:
-								response.headers.add(TRAILER, ETAG)
 							end
 							
 							# Wrap the response with the callback:

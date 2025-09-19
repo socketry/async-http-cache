@@ -159,7 +159,6 @@ module Async::HTTP::Cache
 			it "validate etag" do
 				# First, warm up the cache:
 				response = client.get("/")
-				expect(response.headers).not.to be(:include?, "etag")
 				expect(response.read).to be == "Hello World"
 				expect(response.headers).to be(:include?, "etag")
 				
