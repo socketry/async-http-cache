@@ -6,33 +6,15 @@ Provides a cache middleware for `Async::HTTP` clients and servers.
 
 ## Usage
 
-### Client Side
+Please see the [project documentation](https://socketry.github.io/async-http-cache/) for more details.
 
-``` ruby
-require 'async'
-require 'async/http'
-require 'async/http/cache'
+  - [Getting Started](https://socketry.github.io/async-http-cache/guides/getting-started/index) - This guide explains how to get started with `async-http-cache`, a cache middleware for `Async::HTTP` clients and servers.
 
-endpoint = Async::HTTP::Endpoint.parse("https://www.oriontransfer.co.nz")
-client = Async::HTTP::Client.new(endpoint)
-cache = Async::HTTP::Cache::General.new(client)
+## Releases
 
-Async do
-	2.times do
-		response = cache.get("/products/index")
-		puts response.inspect
-		# <Async::HTTP::Protocol::HTTP2::Response ...>
-		# <Async::HTTP::Cache::Response ...>
-		response.finish
-	end
-ensure
-	cache.close
-end
-```
+Please see the [project releases](https://socketry.github.io/async-http-cache/releases/index) for all releases.
 
-## Vary
-
-The `vary` header creates a headache for proxy implementations, because it creates a combinatorial explosion of cache keys, even if the content is the same. Try to avoid it unless absolutely necessary.
+### Unreleased
 
 ## Contributing
 

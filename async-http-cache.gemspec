@@ -16,12 +16,13 @@ Gem::Specification.new do |spec|
 	spec.homepage = "https://github.com/socketry/async-http-cache"
 	
 	spec.metadata = {
+		"documentation_uri" => "https://socketry.github.io/async-http-cache/",
 		"source_code_uri" => "https://github.com/socketry/async-http-cache.git",
 	}
 	
-	spec.files = Dir.glob(["{lib}/**/*", "*.md"], File::FNM_DOTMATCH, base: __dir__)
+	spec.files = Dir.glob(["{context,lib}/**/*", "*.md"], File::FNM_DOTMATCH, base: __dir__)
 	
-	spec.required_ruby_version = ">= 3.1"
+	spec.required_ruby_version = ">= 3.2"
 	
 	spec.add_dependency "async-http", "~> 0.56"
 end

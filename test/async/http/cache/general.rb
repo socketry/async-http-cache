@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2024, by Samuel Williams.
+# Copyright, 2024-2025, by Samuel Williams.
 
 require "sus/fixtures/async/http"
 require "async/http/cache/a_general_cache"
 
 describe Async::HTTP::Cache::General do
 	include Sus::Fixtures::Async::HTTP::ServerContext
-
+	
 	let(:app) do
 		Protocol::HTTP::Middleware.for do |request|
 			body = Async::HTTP::Body::Writable.new # (11)

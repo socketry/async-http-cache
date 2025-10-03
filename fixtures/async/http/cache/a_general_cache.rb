@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2020-2024, by Samuel Williams.
+# Copyright, 2020-2025, by Samuel Williams.
 # Copyright, 2022, by Colin Kelley.
 
 require "async/http/cache/general"
@@ -96,7 +96,7 @@ module Async::HTTP::Cache
 				[200, 203, 300, 301, 302, 404, 410].each do |response_code|
 					with "cacheable response code #{response_code}", unique: "status-#{response_code}" do
 						let(:response_code) {response_code}
-					
+						
 						it "is cached" do
 							responses = 2.times.map {client.get("/", {}).tap(&:finish)}
 							headers = responses.map {|r| r.headers.to_h}

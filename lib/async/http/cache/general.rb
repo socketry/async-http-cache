@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2020-2024, by Samuel Williams.
+# Copyright, 2020-2025, by Samuel Williams.
 # Copyright, 2022, by Colin Kelley.
 
 require "set"
@@ -100,7 +100,7 @@ module Async
 						Console.logger.debug(self) {"Cannot cache response with set-cookie header!"}
 						return false
 					end
-								
+					
 					return true
 				end
 				
