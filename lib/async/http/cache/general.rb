@@ -37,6 +37,9 @@ module Async
 					410 => true  # Gone
 				}.freeze
 				
+				# Initialize a new cache middleware instance.
+				# @parameter app [Object] The downstream application or middleware.
+				# @parameter store [Store] The cache store to use for persistence.
 				def initialize(app, store: Store.default)
 					super(app)
 					
@@ -48,18 +51,25 @@ module Async
 				attr :count
 				attr :store
 				
+				# Close the cache and clean up resources.
 				def close
 					@store.close
 				ensure
 					super
 				end
 				
+				# Generate a cache key for the given request.
+				# @parameter request [Protocol::HTTP::Request] The HTTP request.
+				# @returns [Array] A cache key array containing authority, method, and path.
 				def key(request)
 					@store.normalize(request)
 					
 					[request.authority, request.method, request.path]
 				end
 				
+				# Determine if a request is cacheable based on method, headers, and body.
+				# @parameter request [Protocol::HTTP::Request] The HTTP request to check.
+				# @returns [Boolean] True if the request can be cached.
 				def cacheable_request?(request)
 					# We don't support caching requests which have a request body:
 					if request.body
@@ -88,6 +98,9 @@ module Async
 					return true
 				end
 				
+				# Check if response headers allow caching.
+				# @parameter headers [Protocol::HTTP::Headers] The response headers to check.
+				# @returns [Boolean] True if headers permit caching.
 				def cacheable_response_headers?(headers)
 					if cache_control = headers[CACHE_CONTROL]
 						if cache_control.no_store? || cache_control.private?
@@ -104,6 +117,9 @@ module Async
 					return true
 				end
 				
+				# Determine if a response is cacheable based on status code and headers.
+				# @parameter response [Protocol::HTTP::Response] The HTTP response to check.
+				# @returns [Boolean] True if the response can be cached.
 				def cacheable_response?(response)
 					# At this point, we know response.status and response.headers.
 					# But we don't know response.body or response.headers.trailer.
@@ -162,6 +178,9 @@ module Async
 					end
 				end
 				
+				# Process an HTTP request, checking cache first and storing responses when appropriate.
+				# @parameter request [Protocol::HTTP::Request] The HTTP request to process.
+				# @returns [Protocol::HTTP::Response] Either a cached response or a fresh response from upstream.
 				def call(request)
 					cache_control = request.headers[CACHE_CONTROL]
 					

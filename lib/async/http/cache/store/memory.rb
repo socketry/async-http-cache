@@ -7,7 +7,12 @@ module Async
 	module HTTP
 		module Cache
 			module Store
+				# Represents an in-memory cache store with automatic pruning of expired entries.
 				class Memory
+					# Initialize a new in-memory cache store.
+					# @parameter limit [Integer] Maximum number of entries to store.
+					# @parameter maximum_size [Integer] Maximum size in bytes for individual cached responses.
+					# @parameter prune_interval [Integer] Interval in seconds between automatic pruning operations.
 					def initialize(limit: 1024, maximum_size: 1024*64, prune_interval: 60)
 						@index = {}
 						@limit = limit
@@ -42,6 +47,7 @@ module Async
 						end
 					end
 					
+					# Close the cache store and stop background pruning.
 					def close
 						@gardener.stop
 					end
@@ -51,6 +57,10 @@ module Async
 					IF_NONE_MATCH = "if-none-match"
 					NOT_MODIFIED = ::Protocol::HTTP::Response[304]
 					
+					# Look up a cached response for the given key and request.
+					# @parameter key [Array] The cache key to look up.
+					# @parameter request [Protocol::HTTP::Request] The HTTP request.
+					# @returns [Protocol::HTTP::Response, nil] The cached response or nil if not found/expired.
 					def lookup(key, request)
 						if response = @index[key]
 							if response.expired?
@@ -77,6 +87,10 @@ module Async
 						end
 					end
 					
+					# Insert a response into the cache if it meets size and limit constraints.
+					# @parameter key [Array] The cache key.
+					# @parameter request [Protocol::HTTP::Request] The HTTP request.
+					# @parameter response [Protocol::HTTP::Response] The HTTP response to cache.
 					def insert(key, request, response)
 						if @index.size < @limit
 							length = response.body&.length

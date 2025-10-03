@@ -13,10 +13,17 @@ require "console/event/failure"
 module Async
 	module HTTP
 		module Cache
+			# Provides utilities for wrapping HTTP response bodies with caching capabilities.
 			module Body
 				TRAILER = "trailer"
 				ETAG = "etag"
 				
+				# Wrap a response body with caching functionality, including ETag generation and completion handling.
+				# @parameter response [Protocol::HTTP::Response] The HTTP response to wrap.
+				# @yields {|response, body| ...} The block to execute when caching is complete.
+				#   @parameter response [Protocol::HTTP::Response] The wrapped response.
+				#   @parameter body [Protocol::HTTP::Body::Buffered, nil] The buffered response body.
+				# @returns [Protocol::HTTP::Response] The original response, potentially with modified headers.
 				def self.wrap(response, &block)
 					if body = response.body
 						if body.empty?
