@@ -9,7 +9,7 @@ require "protocol/http"
 require "sus/fixtures/console"
 
 describe Async::HTTP::Cache::Body do
-	include_context Sus::Fixtures::Console::CapturedLogger
+	include Sus::Fixtures::Console::CapturedLogger
 	
 	let(:body) {Protocol::HTTP::Body::Buffered.new(["Hello", "World"])}
 	let(:response) {Protocol::HTTP::Response[200, [], body]}
